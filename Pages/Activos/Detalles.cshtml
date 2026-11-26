@@ -1,0 +1,125 @@
+@page "{id:int}"
+@model ProyectoAlgoritmos.Pages.Activos.DetallesModel
+
+@{
+    ViewData["Title"] = "Detalles del activo";
+    var activo = Model.Activo;
+}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTARIO / DETALLE</span>
+        <h1>@activo.Marca @activo.Modelo</h1>
+        <p>Información general, garantía y movimientos de reparación del activo.</p>
+    </div>
+    <div class="heading-actions">
+        <a asp-page="Index" class="button button-secondary">Volver a activos</a>
+        <a asp-page="Edit" asp-route-id="@activo.Id" class="button button-primary">Editar activo</a>
+    </div>
+</div>
+
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Información del activo</h2>
+            <p>Datos de identificación y registro del equipo.</p>
+        </div>
+        <span class="status-label">Registrado</span>
+    </div>
+
+    <div class="details-section">
+        <h3>Identificación</h3>
+        <div class="details-grid">
+            <div class="detail-item"><span class="detail-label">Código del activo</span><span class="detail-value">@activo.CodigoActivo</span></div>
+            <div class="detail-item"><span class="detail-label">Número de serie</span><span class="detail-value">@activo.NumeroSerie</span></div>
+            <div class="detail-item"><span class="detail-label">Marca</span><span class="detail-value">@activo.Marca</span></div>
+            <div class="detail-item"><span class="detail-label">Modelo</span><span class="detail-value">@activo.Modelo</span></div>
+            <div class="detail-item"><span class="detail-label">Fecha de registro</span><span class="detail-value">@activo.FechaIngreso.ToString("dd/MM/yyyy")</span></div>
+        </div>
+    </div>
+
+    <div class="details-section">
+        <h3>Compra y garantía</h3>
+        <div class="details-grid">
+            <div class="detail-item"><span class="detail-label">Fecha de compra</span><span class="detail-value">@activo.FechaCompra.ToString("dd/MM/yyyy")</span></div>
+            <div class="detail-item"><span class="detail-label">Años de garantía</span><span class="detail-value">@activo.AnosGarantia</span></div>
+            <div class="detail-item"><span class="detail-label">Factura</span><span class="detail-value">@activo.NumeroFactura</span></div>
+            <div class="detail-item"><span class="detail-label">Monto de compra</span><span class="detail-value">Q @activo.Monto.ToString("N2")</span></div>
+            <div class="detail-item"><span class="detail-label">Vencimiento de garantía</span><span class="detail-value">@activo.FechaVencimientoGarantia.ToString("dd/MM/yyyy")</span></div>
+        </div>
+    </div>
+
+    <div class="details-section">
+        <h3>Proveedor y contacto</h3>
+        <div class="details-grid">
+            <div class="detail-item"><span class="detail-label">Proveedor</span><span class="detail-value">@activo.Proveedor</span></div>
+            <div class="detail-item"><span class="detail-label">Persona de contacto</span><span class="detail-value">@activo.PersonaContacto</span></div>
+            <div class="detail-item"><span class="detail-label">Teléfono</span><span class="detail-value">@activo.Telefono</span></div>
+            <div class="detail-item"><span class="detail-label">Dirección</span><span class="detail-value">@activo.Direccion</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Historial de reparaciones</h2>
+            <p>Registro de intervenciones realizadas a este equipo.</p>
+        </div>
+        <div class="heading-actions">
+            <a asp-page="/Reparaciones/Eliminados" class="button button-secondary">Papelera</a>
+            <a asp-page="/Reparaciones/Create" asp-route-activoId="@activo.Id" class="button button-primary">Registrar reparación</a>
+        </div>
+    </div>
+
+    @if (activo.Reparaciones.Count == 0)
+    {
+        <div class="empty-panel">
+            <strong>Sin reparaciones registradas</strong>
+            <span>Cuando registres una reparación, aparecerá en este historial.</span>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fecha de reparación</th>
+                        <th>Diagnóstico</th>
+                        <th>Proveedor</th>
+                        <th>Factura</th>
+                        <th>Fecha de factura</th>
+                        <th>Monto</th>
+                        <th>Fecha de entrega</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reparacion in activo.Reparaciones.OrderByDescending(r => r.FechaReparacion))
+                    {
+                        <tr>
+                            <td>@reparacion.FechaReparacion.ToString("dd/MM/yyyy")</td>
+                            <td class="diagnosis-cell">@reparacion.Diagnostico</td>
+                            <td>@reparacion.Proveedor</td>
+                            <td>@reparacion.Factura</td>
+                            <td>@reparacion.FechaFactura.ToString("dd/MM/yyyy")</td>
+                            <td>Q @reparacion.Monto.ToString("N2")</td>
+                            <td>@reparacion.FechaEntregaUsuario.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a asp-page="/Reparaciones/Edit" asp-route-id="@reparacion.Id" class="action-link">Editar</a>
+                                    <form method="post" asp-page-handler="EliminarReparacion"
+                                          asp-route-id="@activo.Id" asp-route-reparacionId="@reparacion.Id"
+                                          onsubmit="return confirm('¿Enviar esta reparación a la papelera?');">
+                                        <button type="submit" class="action-link danger-link">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

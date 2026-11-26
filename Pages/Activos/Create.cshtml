@@ -1,0 +1,191 @@
+@page
+@model ProyectoAlgoritmos.Pages.Activos.CreateModel
+
+@{
+    ViewData["Title"] = "Registrar activo";
+}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTARIO</span>
+        <h1>Registrar activo</h1>
+        <p>Completa la información del equipo para incorporarlo al inventario.</p>
+    </div>
+    <div class="heading-actions">
+        <a asp-page="Index" class="button button-secondary">Volver a activos</a>
+    </div>
+</div>
+
+<form method="post" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+    <section class="form-section">
+        <div class="form-section-heading">
+            <h2>Información del activo</h2>
+            <p>Identificación y fechas principales del equipo.</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="Activo.CodigoActivo">Código del activo</label>
+                <input asp-for="Activo.CodigoActivo" id="codigoActivo"
+                       maxlength="13" inputmode="numeric" placeholder="12345-03-2012" />
+                <span class="field-hint">Formato: 12345-03-2012</span>
+                <span asp-validation-for="Activo.CodigoActivo" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.FechaIngreso">Fecha de registro</label>
+                <input asp-for="Activo.FechaIngreso" type="date" />
+                <span asp-validation-for="Activo.FechaIngreso" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.Marca">Marca</label>
+                <input asp-for="Activo.Marca" maxlength="100" placeholder="Ej. Dell" />
+                <span asp-validation-for="Activo.Marca" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.Modelo">Modelo</label>
+                <input asp-for="Activo.Modelo" maxlength="100" placeholder="Modelo del equipo" />
+                <span asp-validation-for="Activo.Modelo" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.NumeroSerie">Número de serie</label>
+                <input asp-for="Activo.NumeroSerie" maxlength="100" placeholder="Número de serie" />
+                <span asp-validation-for="Activo.NumeroSerie" class="field-validation-error"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <div class="form-section-heading">
+            <h2>Compra y garantía</h2>
+            <p>Datos de adquisición y cálculo de vencimiento de garantía.</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="Activo.FechaCompra">Fecha de compra</label>
+                <input asp-for="Activo.FechaCompra" type="date" />
+                <span asp-validation-for="Activo.FechaCompra" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.AnosGarantia">Años de garantía</label>
+                <input asp-for="Activo.AnosGarantia" type="number" min="0" step="1" />
+                <span asp-validation-for="Activo.AnosGarantia" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Número de factura</label>
+                <div class="input-prefix">
+                    <span>FAC-</span>
+                    <input id="numeroFactura" maxlength="5" inputmode="numeric" placeholder="12345" />
+                </div>
+                <input type="hidden" asp-for="Activo.NumeroFactura" id="facturaCompleta" />
+                <span asp-validation-for="Activo.NumeroFactura" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.Monto">Monto de compra (Q)</label>
+                <input asp-for="Activo.Monto" type="number" min="0" step="0.01" placeholder="0.00" />
+                <span asp-validation-for="Activo.Monto" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.FechaVencimientoGarantia">Vencimiento de garantía</label>
+                <input asp-for="Activo.FechaVencimientoGarantia" type="date" readonly />
+                <span class="field-hint">Se calcula automáticamente.</span>
+                <span asp-validation-for="Activo.FechaVencimientoGarantia" class="field-validation-error"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <div class="form-section-heading">
+            <h2>Proveedor y contacto</h2>
+            <p>Información de la empresa o persona que suministró el equipo.</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="Activo.Proveedor">Proveedor</label>
+                <input asp-for="Activo.Proveedor" maxlength="200" placeholder="Nombre del proveedor" />
+                <span asp-validation-for="Activo.Proveedor" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.PersonaContacto">Persona de contacto</label>
+                <input asp-for="Activo.PersonaContacto" maxlength="200" placeholder="Nombre completo" />
+                <span asp-validation-for="Activo.PersonaContacto" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.Telefono">Teléfono</label>
+                <input asp-for="Activo.Telefono" id="telefono" maxlength="9"
+                       inputmode="numeric" placeholder="1234-5678" />
+                <span asp-validation-for="Activo.Telefono" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Activo.Direccion">Dirección</label>
+                <input asp-for="Activo.Direccion" maxlength="300" placeholder="Dirección del proveedor" />
+                <span asp-validation-for="Activo.Direccion" class="field-validation-error"></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="form-actions">
+        <a asp-page="Index" class="button button-secondary">Cancelar</a>
+        <button type="submit" class="button button-primary">Guardar activo</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const codigo = document.getElementById("codigoActivo");
+        const fechaCompra = document.getElementById("Activo_FechaCompra");
+        const anosGarantia = document.getElementById("Activo_AnosGarantia");
+        const fechaVencimiento = document.getElementById("Activo_FechaVencimientoGarantia");
+        const fechaIngreso = document.getElementById("Activo_FechaIngreso");
+        const factura = document.getElementById("numeroFactura");
+        const facturaCompleta = document.getElementById("facturaCompleta");
+        const telefono = document.getElementById("telefono");
+
+        function aplicarFormatoCodigo() {
+            const numeros = codigo.value.replace(/\D/g, "").slice(0, 11);
+            let resultado = numeros.slice(0, 5);
+            if (numeros.length > 5) resultado += "-" + numeros.slice(5, 7);
+            if (numeros.length > 7) resultado += "-" + numeros.slice(7, 11);
+            codigo.value = resultado;
+        }
+
+        function calcularGarantia() {
+            if (!fechaCompra.value || anosGarantia.value === "") return;
+            const [y, m, d] = fechaCompra.value.split("-").map(Number);
+            const anos = Number(anosGarantia.value);
+            if (!Number.isInteger(anos) || anos < 0 || y + anos > 9999) return;
+            const maxDia = new Date(Date.UTC(y + anos, m, 0)).getUTCDate();
+            const fecha = new Date(Date.UTC(y + anos, m - 1, Math.min(d, maxDia)));
+            if (anos > 0) fecha.setUTCDate(fecha.getUTCDate() - 1);
+            fechaVencimiento.value = fecha.toISOString().slice(0, 10);
+        }
+
+        codigo.addEventListener("input", aplicarFormatoCodigo);
+        fechaCompra.addEventListener("change", calcularGarantia);
+        anosGarantia.addEventListener("input", calcularGarantia);
+        fechaIngreso.addEventListener("change", () => fechaCompra.min = fechaIngreso.value);
+        factura.addEventListener("input", () => {
+            factura.value = factura.value.replace(/\D/g, "").slice(0, 5);
+            facturaCompleta.value = "FAC-" + factura.value;
+        });
+        telefono.addEventListener("input", () => {
+            const n = telefono.value.replace(/\D/g, "").slice(0, 8);
+            telefono.value = n.length > 4 ? n.slice(0, 4) + "-" + n.slice(4) : n;
+        });
+    </script>
+}

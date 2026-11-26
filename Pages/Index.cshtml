@@ -1,0 +1,149 @@
+﻿@page
+@model ProyectoAlgoritmos.Pages.IndexModel
+
+@{
+    ViewData["Title"] = "Resumen";
+}
+
+<div class="overview-page">
+
+    <div class="page-heading overview-heading">
+        <div>
+            <h1>Resumen</h1>
+        </div>
+
+        <a asp-page="/Activos/Create" class="button button-primary">
+            Registrar activo
+        </a>
+    </div>
+
+    <section class="overview-metrics" aria-label="Resumen del inventario">
+        <div class="overview-metric">
+            <strong>@Model.TotalActivos.ToString("00")</strong>
+            <span>Activos</span>
+        </div>
+        <div class="overview-metric">
+            <strong>@Model.TotalReparaciones.ToString("00")</strong>
+            <span>Reparaciones</span>
+        </div>
+    </section>
+
+    <section class="overview-section">
+        <div class="section-heading">
+            <div>
+                <h2>Activos recientes</h2>
+            </div>
+
+            <a asp-page="/Activos/Index" class="section-link">
+                Ver inventario
+            </a>
+        </div>
+
+        <div class="inventory-card">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Fecha de ingreso</th>
+                            <th>Garantía</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ActivosRecientes.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    Todavía no hay activos registrados.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var activo in Model.ActivosRecientes)
+                            {
+                                <tr>
+                                    <td class="primary-cell">@activo.CodigoActivo</td>
+                                    <td>@activo.Marca</td>
+                                    <td>@activo.Modelo</td>
+                                    <td>@activo.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                                    <td>@activo.FechaVencimientoGarantia.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <a asp-page="/Activos/Detalles"
+                                           asp-route-id="@activo.Id"
+                                           class="action-link">
+                                            Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="overview-section">
+        <div class="section-heading">
+            <div>
+                <h2>Reparaciones recientes</h2>
+            </div>
+
+            <a asp-page="/Activos/Index"
+               asp-route-vista="reparaciones"
+               class="section-link">
+                Ver reparaciones
+            </a>
+        </div>
+
+        <div class="inventory-card">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Modelo</th>
+                            <th>Fecha de reparación</th>
+                            <th>Diagnóstico</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ReparacionesRecientes.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    No hay reparaciones registradas.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var reparacion in Model.ReparacionesRecientes)
+                            {
+                                <tr>
+                                    <td class="primary-cell">@reparacion.Activo.CodigoActivo</td>
+                                    <td>@reparacion.Activo.Modelo</td>
+                                    <td>@reparacion.FechaReparacion.ToString("dd/MM/yyyy")</td>
+                                    <td class="diagnosis-cell">@reparacion.Diagnostico</td>
+                                    <td>
+                                        <a asp-page="/Activos/Detalles"
+                                           asp-route-id="@reparacion.ActivoId"
+                                           class="action-link">
+                                            Historial
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+

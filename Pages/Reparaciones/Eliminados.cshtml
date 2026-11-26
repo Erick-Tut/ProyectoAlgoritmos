@@ -1,0 +1,79 @@
+@page
+@model ProyectoAlgoritmos.Pages.Reparaciones.EliminadosModel
+
+@{
+    ViewData["Title"] = "Papelera de reparaciones";
+}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">ACTIVOS / REPARACIONES</span>
+        <h1>Papelera de reparaciones</h1>
+        <p>Administra los registros de reparación que fueron enviados a la papelera.</p>
+    </div>
+    <div class="heading-actions">
+        <a asp-page="/Activos/Index" asp-route-vista="reparaciones" class="button button-secondary">Volver a reparaciones</a>
+    </div>
+</div>
+
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Reparaciones eliminadas</h2>
+            <p>@Model.Reparaciones.Count registro(s) en la papelera.</p>
+        </div>
+    </div>
+
+    @if (Model.Reparaciones.Count == 0)
+    {
+        <div class="empty-panel">
+            <strong>La papelera está vacía</strong>
+            <span>Las reparaciones eliminadas aparecerán aquí.</span>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Fecha de reparación</th>
+                        <th>Diagnóstico</th>
+                        <th>Proveedor</th>
+                        <th>Factura</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reparacion in Model.Reparaciones)
+                    {
+                        <tr>
+                            <td>
+                                <strong class="table-primary-text">@reparacion.Activo.CodigoActivo</strong>
+                                <span class="table-secondary-text">@reparacion.Activo.Marca @reparacion.Activo.Modelo</span>
+                            </td>
+                            <td>@reparacion.FechaReparacion.ToString("dd/MM/yyyy")</td>
+                            <td class="diagnosis-cell">@reparacion.Diagnostico</td>
+                            <td>@reparacion.Proveedor</td>
+                            <td>@reparacion.Factura</td>
+                            <td>Q @reparacion.Monto.ToString("N2")</td>
+                            <td>
+                                <div class="table-actions">
+                                    <form method="post" asp-page-handler="Restaurar" asp-route-id="@reparacion.Id">
+                                        <button type="submit" class="action-link">Restaurar</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="EliminarDefinitivamente" asp-route-id="@reparacion.Id"
+                                          onsubmit="return confirm('¿Eliminar definitivamente esta reparación? Esta acción no se puede deshacer.');">
+                                        <button type="submit" class="action-link danger-link">Eliminar definitivamente</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

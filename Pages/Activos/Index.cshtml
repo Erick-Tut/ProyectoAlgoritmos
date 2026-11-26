@@ -1,0 +1,231 @@
+@page
+@model ProyectoAlgoritmos.Pages.Activos.IndexModel
+
+@{
+    ViewData["Title"] = "Activos";
+}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTARIO</span>
+        <h1>Activos</h1>
+        <p>Administra los equipos registrados y consulta su historial de reparaciones.</p>
+    </div>
+
+    <div class="heading-actions">
+        <a asp-page="Eliminados" class="button button-secondary">
+            Papelera
+        </a>
+
+        @if (Model.Vista == "activos")
+        {
+            <a asp-page="Create" class="button button-primary">
+                + Registrar activo
+            </a>
+        }
+    </div>
+</div>
+
+<section class="overview-metrics" aria-label="Resumen del inventario">
+    <div class="overview-metric">
+        <strong>@Model.TotalActivos.ToString("00")</strong>
+        <span>Activos</span>
+    </div>
+
+    <div class="overview-metric">
+        <strong>@Model.TotalReparaciones.ToString("00")</strong>
+        <span>Reparaciones</span>
+    </div>
+</section>
+
+<div class="inventory-card">
+    <div class="tabs">
+        <a asp-page="./Index"
+           asp-route-vista="activos"
+           class="tab-link @(Model.Vista == "activos" ? "selected" : "")">
+            Activos
+            <span class="tab-count">@Model.TotalActivos</span>
+        </a>
+
+        <a asp-page="./Index"
+           asp-route-vista="reparaciones"
+           class="tab-link @(Model.Vista == "reparaciones" ? "selected" : "")">
+            Reparaciones
+            <span class="tab-count">@Model.TotalReparaciones</span>
+        </a>
+    </div>
+
+    <div class="table-heading">
+        <div>
+            @if (Model.Vista == "activos")
+            {
+                <h2>Equipos registrados</h2>
+                <p>Consulta y administra los equipos que forman parte del inventario.</p>
+            }
+            else
+            {
+                <h2>Historial de reparaciones</h2>
+                <p>Consulta los registros de reparación de los equipos.</p>
+            }
+        </div>
+    </div>
+
+    <form method="get" class="inventory-search">
+        <input type="hidden" name="vista" value="@Model.Vista" />
+
+        <div class="search-field">
+            <span class="search-symbol">⌕</span>
+            <input type="search"
+                   name="buscar"
+                   value="@Model.Buscar"
+                   placeholder="@(Model.Vista == "activos"
+                       ? "Buscar por código, marca, modelo o serie..."
+                       : "Buscar por código, equipo o diagnóstico...")" />
+        </div>
+
+        <button type="submit" class="button button-secondary">
+            Buscar
+        </button>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Buscar))
+        {
+            <a asp-page="./Index"
+               asp-route-vista="@Model.Vista"
+               class="clear-search">
+                Limpiar
+            </a>
+        }
+    </form>
+
+    @if (Model.Vista == "activos")
+    {
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código del activo</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Número de serie</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Vencimiento de garantía</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Activos.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                @if (!string.IsNullOrWhiteSpace(Model.Buscar))
+                                {
+                                    <strong>No se encontraron resultados</strong>
+                                    <span>Prueba con otro término de búsqueda.</span>
+                                }
+                                else
+                                {
+                                    <strong>No hay activos registrados</strong>
+                                    <span>Registra un equipo para comenzar a utilizar el inventario.</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var activo in Model.Activos)
+                        {
+                            <tr>
+                                <td class="primary-cell">@activo.CodigoActivo</td>
+                                <td>@activo.Marca</td>
+                                <td>@activo.Modelo</td>
+                                <td>@activo.NumeroSerie</td>
+                                <td>@activo.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                                <td>@activo.FechaVencimientoGarantia.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a asp-page="Detalles"
+                                           asp-route-id="@activo.Id"
+                                           class="action-link">
+                                            Ver
+                                        </a>
+
+                                        <a asp-page="Edit"
+                                           asp-route-id="@activo.Id"
+                                           class="action-link">
+                                            Editar
+                                        </a>
+
+                                        <form method="post"
+                                              asp-page-handler="Eliminar"
+                                              asp-route-id="@activo.Id"
+                                              onsubmit="return confirm('¿Deseas enviar este activo a la papelera?');">
+                                            <button type="submit" class="action-link danger-link">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código del activo</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Fecha de reparación</th>
+                        <th>Diagnóstico</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Reparaciones.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                @if (!string.IsNullOrWhiteSpace(Model.Buscar))
+                                {
+                                    <strong>No se encontraron resultados</strong>
+                                    <span>Prueba con otro término de búsqueda.</span>
+                                }
+                                else
+                                {
+                                    <strong>No hay reparaciones registradas</strong>
+                                    <span>Las reparaciones de los equipos aparecerán aquí.</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var reparacion in Model.Reparaciones)
+                        {
+                            <tr>
+                                <td class="primary-cell">@reparacion.Activo.CodigoActivo</td>
+                                <td>@reparacion.Activo.Marca</td>
+                                <td>@reparacion.Activo.Modelo</td>
+                                <td>@reparacion.FechaReparacion.ToString("dd/MM/yyyy")</td>
+                                <td class="diagnosis-cell">@reparacion.Diagnostico</td>
+                                <td>
+                                    <a asp-page="Detalles"
+                                       asp-route-id="@reparacion.ActivoId"
+                                       class="action-link">
+                                        Ver historial
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

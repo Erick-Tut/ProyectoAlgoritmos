@@ -1,0 +1,72 @@
+@page
+@model ProyectoAlgoritmos.Pages.Activos.EliminadosModel
+
+@{
+    ViewData["Title"] = "Papelera de activos";
+}
+
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTARIO</span>
+        <h1>Papelera de activos</h1>
+        <p>Los activos eliminados se conservan aquí hasta que los restaures o elimines definitivamente.</p>
+    </div>
+    <div class="heading-actions">
+        <a asp-page="Index" class="button button-secondary">Volver a activos</a>
+    </div>
+</div>
+
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Activos eliminados</h2>
+            <p>@Model.Activos.Count registro(s) en la papelera.</p>
+        </div>
+    </div>
+
+    @if (Model.Activos.Count == 0)
+    {
+        <div class="empty-panel">
+            <strong>La papelera está vacía</strong>
+            <span>Los activos que envíes a la papelera aparecerán aquí.</span>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código del activo</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Número de serie</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var activo in Model.Activos)
+                    {
+                        <tr>
+                            <td class="primary-cell">@activo.CodigoActivo</td>
+                            <td>@activo.Marca</td>
+                            <td>@activo.Modelo</td>
+                            <td>@activo.NumeroSerie</td>
+                            <td>
+                                <div class="table-actions">
+                                    <form method="post" asp-page-handler="Restaurar" asp-route-id="@activo.Id">
+                                        <button type="submit" class="action-link">Restaurar</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="EliminarDefinitivamente" asp-route-id="@activo.Id"
+                                          onsubmit="return confirm('Se eliminará permanentemente este activo y todas sus reparaciones. ¿Deseas continuar?');">
+                                        <button type="submit" class="action-link danger-link">Eliminar definitivamente</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

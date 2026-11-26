@@ -1,0 +1,191 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Caso 1</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <canvas class="sidebar-particles" aria-hidden="true"></canvas>
+            <div class="brand">
+                <span class="brand-name">Caso 1</span>
+                <span class="brand-subtitle">Algoritmos</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <span class="nav-heading">MENÚ</span>
+
+                <a asp-page="/Index"
+                   class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                    <span>Resumen</span>
+                </a>
+
+                <a asp-page="/Activos/Index"
+                   class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString()?.StartsWith("/Activos") == true ? "active" : "")">
+                    <span>Activos</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="student-info">
+                    <span class="student-name">Erik Carlos Omar Cucul Tut</span>
+                    <span class="student-id">0914-26-2042</span>
+                    <span class="student-course">Algoritmos</span>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-section">Caso 1</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <strong>@ViewData["Title"]</strong>
+                </div>
+            </header>
+
+            <main class="page-content">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (() => {
+            const canvas = document.querySelector(".sidebar-particles");
+            const sidebar = document.querySelector(".sidebar");
+            if (!canvas || !sidebar) return;
+
+            const context = canvas.getContext("2d");
+            if (!context) return;
+
+            const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            const pointer = { x: -1000, y: -1000, active: false };
+            const particles = [];
+            let width = 0;
+            let height = 0;
+            let animationFrame = 0;
+
+            const resize = () => {
+                const bounds = sidebar.getBoundingClientRect();
+                const ratio = Math.min(window.devicePixelRatio || 1, 2);
+                width = bounds.width;
+                height = bounds.height;
+                canvas.width = Math.round(width * ratio);
+                canvas.height = Math.round(height * ratio);
+                canvas.style.width = width + "px";
+                canvas.style.height = height + "px";
+                context.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+                const count = Math.max(28, Math.min(62, Math.round(width * height / 9500)));
+                particles.length = 0;
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - .5) * .22,
+                        vy: (Math.random() - .5) * .22,
+                        radius: .8 + Math.random() * 1.15,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            };
+
+            const movePointer = (event) => {
+                const bounds = sidebar.getBoundingClientRect();
+                pointer.x = event.clientX - bounds.left;
+                pointer.y = event.clientY - bounds.top;
+                pointer.active = true;
+            };
+
+            const leavePointer = () => {
+                pointer.active = false;
+                pointer.x = -1000;
+                pointer.y = -1000;
+            };
+
+            const draw = (time) => {
+                context.clearRect(0, 0, width, height);
+                const linkDistance = pointer.active ? 118 : 82;
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    const dx = pointer.x - p.x;
+                    const dy = pointer.y - p.y;
+                    const distance = Math.hypot(dx, dy);
+
+                    if (pointer.active && distance < 190) {
+                        const force = (1 - distance / 190) * .012;
+                        p.vx += dx * force * .018;
+                        p.vy += dy * force * .018;
+                    }
+
+                    p.vx += Math.sin(time * .00035 + p.phase) * .0018;
+                    p.vy += Math.cos(time * .0003 + p.phase) * .0018;
+                    p.vx *= .993;
+                    p.vy *= .993;
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < -8) p.x = width + 8;
+                    if (p.x > width + 8) p.x = -8;
+                    if (p.y < -8) p.y = height + 8;
+                    if (p.y > height + 8) p.y = -8;
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const q = particles[j];
+                        const lineDistance = Math.hypot(p.x - q.x, p.y - q.y);
+                        if (lineDistance < linkDistance) {
+                            const alpha = (1 - lineDistance / linkDistance) * .19;
+                            context.strokeStyle = `rgba(105, 113, 124, ${alpha})`;
+                            context.lineWidth = .7;
+                            context.beginPath();
+                            context.moveTo(p.x, p.y);
+                            context.lineTo(q.x, q.y);
+                            context.stroke();
+                        }
+                    }
+
+                    if (pointer.active && distance < 155) {
+                        context.strokeStyle = `rgba(100, 109, 121, ${(1 - distance / 155) * .22})`;
+                        context.lineWidth = .8;
+                        context.beginPath();
+                        context.moveTo(p.x, p.y);
+                        context.lineTo(pointer.x, pointer.y);
+                        context.stroke();
+                    }
+
+                    const glow = pointer.active && distance < 150 ? .75 : .42;
+                    context.fillStyle = `rgba(105, 113, 124, ${glow})`;
+                    context.beginPath();
+                    context.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    context.fill();
+                }
+
+                if (!reduceMotion) animationFrame = requestAnimationFrame(draw);
+            };
+
+            sidebar.addEventListener("pointermove", movePointer);
+            sidebar.addEventListener("pointerleave", leavePointer);
+            window.addEventListener("resize", resize);
+            resize();
+
+            if (reduceMotion) {
+                draw(0);
+            } else {
+                animationFrame = requestAnimationFrame(draw);
+            }
+
+            window.addEventListener("pagehide", () => {
+                if (animationFrame) cancelAnimationFrame(animationFrame);
+            }, { once: true });
+        })();
+    </script>
+</body>
+</html>
